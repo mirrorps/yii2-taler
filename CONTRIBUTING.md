@@ -23,7 +23,7 @@ We welcome all kinds of contributions, including:
 
 ## Reporting Bugs
 
-If you find a bug, please [open an issue](https://github.com/mirrorps/taler-php/issues) and include:
+If you find a bug, please [open an issue](https://github.com/mirrorps/yii2-taler/issues) and include:
 
 - A clear and descriptive title
 - Steps to reproduce the issue
@@ -32,7 +32,7 @@ If you find a bug, please [open an issue](https://github.com/mirrorps/taler-php/
 
 ## Suggesting Enhancements
 
-To suggest an enhancement, [open an issue](https://github.com/mirrorps/taler-php/issues) and describe:
+To suggest an enhancement, [open an issue](https://github.com/mirrorps/yii2-taler/issues) and describe:
 
 - The motivation for the enhancement
 - How it would improve Yii2Taler
