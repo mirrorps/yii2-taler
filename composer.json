@@ -1,0 +1,29 @@
+{
+  "name": "mirrorps/yii2-taler",
+  "description": "Yii2 extension for GNU Taler REST API integration ",
+  "type": "yii2-extension",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.1",
+    "yiisoft/yii2": "^2.0",
+    "mirrorps/taler-php": "dev-main"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/mirrorps/taler-php"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "mirrorps\\Yii2Taler\\": "src/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
+
+
