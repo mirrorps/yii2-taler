@@ -6,10 +6,18 @@
   "require": {
     "php": ">=8.1",
     "yiisoft/yii2": "^2.0",
-    "mirrorps/taler-php": "dev-main"
+    "mirrorps/taler-php": "dev-main",
+    "psr/http-client": "^1.0",
+    "guzzlehttp/guzzle": "^7.0"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest"
+    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "mirrorps\\Yii2Taler\\Tests\\": "tests/"
+    }
   },
   "repositories": [
     {
@@ -22,8 +30,14 @@
       "mirrorps\\Yii2Taler\\": "src/"
     }
   },
+  "extra": {
+    "bootstrap": "mirrorps\\Yii2Taler\\Bootstrap"
+  },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
+  }
 }
-
-
