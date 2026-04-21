@@ -5,6 +5,7 @@ namespace mirrorps\Yii2Taler;
 use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
+use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -68,6 +69,7 @@ class Taler extends Component
     private ?InstanceService $_instanceService = null;
 
     private ?ConfigService $_configService = null;
+    private ?BankAccountService $_bankAccountService = null;
 
     /**
      * @throws InvalidConfigException
@@ -133,6 +135,20 @@ class Taler extends Component
         }
 
         return $this->_configService;
+    }
+
+    /**
+     * Returns the Bank Account API service.
+     *
+     * @return BankAccountService
+     */
+    public function bankAccounts(): BankAccountService
+    {
+        if ($this->_bankAccountService === null) {
+            $this->_bankAccountService = new BankAccountService($this);
+        }
+
+        return $this->_bankAccountService;
     }
 
     /**

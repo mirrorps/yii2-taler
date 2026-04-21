@@ -371,6 +371,68 @@ $promise = Yii::$app->taler->instances()->getInstancesAsync();
 $list = $promise->wait();
 ```
 
+## Bank Accounts API
+
+The Bank Accounts API is accessible via `Yii::$app->taler->bankAccounts()`.
+
+### List Bank Accounts
+
+```php
+$accounts = Yii::$app->taler->bankAccounts()->getAccounts();
+
+foreach ($accounts->accounts as $entry) {
+    echo $entry->h_wire . ' ' . $entry->payto_uri . PHP_EOL;
+}
+```
+
+### Get Bank Account Details
+
+```php
+$account = Yii::$app->taler->bankAccounts()->getAccount('h_wire_hash_here');
+
+echo $account->payto_uri . PHP_EOL;
+echo $account->active ? 'active' : 'inactive';
+```
+
+### Create Bank Account
+
+```php
+use Taler\Api\BankAccounts\Dto\AccountAddDetails;
+use Taler\Api\BankAccounts\Dto\AccountAddResponse;
+use Taler\Api\TwoFactorAuth\Dto\ChallengeResponse;
+
+$result = Yii::$app->taler->bankAccounts()->createAccount(
+    new AccountAddDetails(
+        payto_uri: 'payto://iban/DE75512108001245126199?receiver-name=Merchant'
+    )
+);
+
+if ($result instanceof ChallengeResponse) {
+    echo '2FA required: ' . $result->getChallengeId() . PHP_EOL;
+} elseif ($result instanceof AccountAddResponse) {
+    echo 'h_wire: ' . $result->h_wire . PHP_EOL;
+}
+```
+
+### Update Bank Account
+
+```php
+use Taler\Api\BankAccounts\Dto\AccountPatchDetails;
+
+Yii::$app->taler->bankAccounts()->updateAccount(
+    'h_wire_hash_here',
+    new AccountPatchDetails(
+        credit_facade_url: 'https://bank-facade.example'
+    )
+);
+```
+
+### Delete Bank Account
+
+```php
+Yii::$app->taler->bankAccounts()->deleteAccount('h_wire_hash_here');
+```
+
 ## Testing
 
 ```bash

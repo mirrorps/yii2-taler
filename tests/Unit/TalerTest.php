@@ -5,6 +5,7 @@ namespace mirrorps\Yii2Taler\Tests\Unit;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Order\OrderService;
+use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use mirrorps\Yii2Taler\Taler;
 use PHPUnit\Framework\TestCase;
 use Taler\Taler as TalerClient;
@@ -138,6 +139,24 @@ class TalerTest extends TestCase
         $component = new Taler(['baseUrl' => 'https://example.com']);
 
         $this->assertSame($component->instances(), $component->instances());
+    }
+
+    public function testBankAccountsReturnsBankAccountService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(BankAccountService::class, $component->bankAccounts());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::bankAccounts()}: repeated calls
+     * must return the same BankAccountService instance rather than a fresh one.
+     */
+    public function testBankAccountsReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->bankAccounts(), $component->bankAccounts());
     }
 
     /**
