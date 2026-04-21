@@ -2,7 +2,9 @@
 
 namespace mirrorps\Yii2Taler;
 
+use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Order\OrderService;
+use mirrorps\Yii2Taler\Config\ConfigService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -63,6 +65,10 @@ class Taler extends Component
 
     private ?OrderService $_orderService = null;
 
+    private ?InstanceService $_instanceService = null;
+
+    private ?ConfigService $_configService = null;
+
     /**
      * @throws InvalidConfigException
      */
@@ -99,6 +105,34 @@ class Taler extends Component
         }
 
         return $this->_orderService;
+    }
+
+    /**
+     * Returns the Instance API service.
+     *
+     * @return InstanceService
+     */
+    public function instances(): InstanceService
+    {
+        if ($this->_instanceService === null) {
+            $this->_instanceService = new InstanceService($this);
+        }
+
+        return $this->_instanceService;
+    }
+
+    /**
+     * Returns the Config API service.
+     *
+     * @return ConfigService
+     */
+    public function configs(): ConfigService
+    {
+        if ($this->_configService === null) {
+            $this->_configService = new ConfigService($this);
+        }
+
+        return $this->_configService;
     }
 
     /**

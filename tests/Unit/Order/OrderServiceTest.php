@@ -40,8 +40,6 @@ class OrderServiceTest extends TestCase
         $this->service = new OrderService($this->taler);
     }
 
-    // ── orders() accessor on Taler ──────────────────────────────────────
-
     public function testTalerOrdersReturnsSameInstance(): void
     {
         $taler = $this->getMockBuilder(Taler::class)
@@ -70,8 +68,6 @@ class OrderServiceTest extends TestCase
 
         $this->assertInstanceOf(OrderService::class, $taler->orders());
     }
-
-    // ── getOrders ───────────────────────────────────────────────────────
 
     public function testGetOrdersDelegatesToClient(): void
     {
@@ -131,8 +127,6 @@ class OrderServiceTest extends TestCase
         $this->assertSame('promise', $result);
     }
 
-    // ── getOrder ────────────────────────────────────────────────────────
-
     public function testGetOrderDelegatesToClient(): void
     {
         $unpaid = $this->createMock(CheckPaymentUnpaidResponse::class);
@@ -174,8 +168,6 @@ class OrderServiceTest extends TestCase
 
         $this->assertSame('promise', $result);
     }
-
-    // ── createOrder ─────────────────────────────────────────────────────
 
     public function testCreateOrderDelegatesToClient(): void
     {
@@ -223,8 +215,6 @@ class OrderServiceTest extends TestCase
         $this->assertSame('promise', $result);
     }
 
-    // ── refundOrder ─────────────────────────────────────────────────────
-
     public function testRefundOrderDelegatesToClient(): void
     {
         $refundRequest = new RefundRequest(refund: 'KUDOS:1.00', reason: 'Defective');
@@ -259,8 +249,6 @@ class OrderServiceTest extends TestCase
         $this->assertSame('promise', $result);
     }
 
-    // ── deleteOrder ─────────────────────────────────────────────────────
-
     public function testDeleteOrderDelegatesToClient(): void
     {
         $this->orderClient
@@ -283,8 +271,6 @@ class OrderServiceTest extends TestCase
 
         $this->assertSame('promise', $result);
     }
-
-    // ── forgetOrder ─────────────────────────────────────────────────────
 
     public function testForgetOrderDelegatesToClient(): void
     {
@@ -312,8 +298,6 @@ class OrderServiceTest extends TestCase
 
         $this->assertSame('promise', $result);
     }
-
-    // ── getOrderClient ──────────────────────────────────────────────────
 
     public function testGetOrderClientReturnsSameInstance(): void
     {
