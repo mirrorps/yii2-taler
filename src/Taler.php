@@ -6,6 +6,7 @@ use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
+use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -70,6 +71,7 @@ class Taler extends Component
 
     private ?ConfigService $_configService = null;
     private ?BankAccountService $_bankAccountService = null;
+    private ?DonauCharityService $_donauCharityService = null;
 
     /**
      * @throws InvalidConfigException
@@ -149,6 +151,20 @@ class Taler extends Component
         }
 
         return $this->_bankAccountService;
+    }
+
+    /**
+     * Returns the Donau Charity API service.
+     *
+     * @return DonauCharityService
+     */
+    public function donauCharities(): DonauCharityService
+    {
+        if ($this->_donauCharityService === null) {
+            $this->_donauCharityService = new DonauCharityService($this);
+        }
+
+        return $this->_donauCharityService;
     }
 
     /**

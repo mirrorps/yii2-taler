@@ -433,6 +433,44 @@ Yii::$app->taler->bankAccounts()->updateAccount(
 Yii::$app->taler->bankAccounts()->deleteAccount('h_wire_hash_here');
 ```
 
+## Donau Charity API
+
+The Donau Charity API is accessible via `Yii::$app->taler->donauCharities()`.
+
+### List Linked Donau Charity Instances
+
+```php
+$response = Yii::$app->taler->donauCharities()->getInstances();
+
+foreach ($response->donau_instances as $instance) {
+    echo '#' . $instance->donau_instance_serial . ' ' . $instance->charity_name . PHP_EOL;
+}
+```
+
+### Link a Donau Charity
+
+```php
+use Taler\Api\DonauCharity\Dto\PostDonauRequest;
+use Taler\Api\TwoFactorAuth\Dto\ChallengeResponse;
+
+$result = Yii::$app->taler->donauCharities()->createDonauCharity(
+    new PostDonauRequest(
+        donau_url: 'https://donau.example',
+        charity_id: 42,
+    )
+);
+
+if ($result instanceof ChallengeResponse) {
+    echo '2FA required: ' . $result->getChallengeId() . PHP_EOL;
+}
+```
+
+### Unlink a Donau Charity by Serial
+
+```php
+Yii::$app->taler->donauCharities()->deleteDonauCharityBySerial(42);
+```
+
 ## Testing
 
 ```bash
