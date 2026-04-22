@@ -8,6 +8,7 @@ use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
+use mirrorps\Yii2Taler\Templates\TemplatesService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -74,6 +75,7 @@ class Taler extends Component
     private ?BankAccountService $_bankAccountService = null;
     private ?DonauCharityService $_donauCharityService = null;
     private ?OtpDevicesService $_otpDevicesService = null;
+    private ?TemplatesService $_templatesService = null;
 
     /**
      * @throws InvalidConfigException
@@ -181,6 +183,20 @@ class Taler extends Component
         }
 
         return $this->_otpDevicesService;
+    }
+
+    /**
+     * Returns the Templates API service.
+     *
+     * @return TemplatesService
+     */
+    public function templates(): TemplatesService
+    {
+        if ($this->_templatesService === null) {
+            $this->_templatesService = new TemplatesService($this);
+        }
+
+        return $this->_templatesService;
     }
 
     /**

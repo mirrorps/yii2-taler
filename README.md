@@ -353,6 +353,85 @@ $counters = Yii::$app->taler->instances()->getMerchantStatisticsCounter(
 );
 ```
 
+## Templates API
+
+The Templates API is accessible via `Yii::$app->taler->templates()`.
+
+### List Templates
+
+```php
+$response = Yii::$app->taler->templates()->getTemplates();
+
+foreach ($response->templates as $template) {
+    echo $template->template_id . ' — ' . $template->template_description . PHP_EOL;
+}
+```
+
+### Get Template Details
+
+```php
+$details = Yii::$app->taler->templates()->getTemplate('coffee-small');
+
+echo $details->template_description . PHP_EOL;
+echo $details->template_contract->summary . PHP_EOL;
+echo $details->template_contract->amount . PHP_EOL;
+echo $details->template_contract->minimum_age . PHP_EOL;
+```
+
+### Create Template
+
+```php
+use Taler\Api\Dto\RelativeTime;
+use Taler\Api\Templates\Dto\TemplateAddDetails;
+use Taler\Api\Templates\Dto\TemplateContractDetails;
+
+Yii::$app->taler->templates()->createTemplate(
+    new TemplateAddDetails(
+        template_id: 'coffee-small',
+        template_description: 'Small coffee in paper cup',
+        template_contract: new TemplateContractDetails(
+            minimum_age: 0,
+            pay_duration: new RelativeTime(900_000_000),
+            summary: 'Small coffee',
+            currency: 'KUDOS',
+            amount: 'KUDOS:2.50'
+        ),
+        otp_id: null,
+        editable_defaults: ['extra_note' => true]
+    )
+);
+```
+
+### Update Template
+
+```php
+use Taler\Api\Dto\RelativeTime;
+use Taler\Api\Templates\Dto\TemplatePatchDetails;
+use Taler\Api\Templates\Dto\TemplateContractDetails;
+
+Yii::$app->taler->templates()->updateTemplate(
+    'coffee-small',
+    new TemplatePatchDetails(
+        template_description: 'Small coffee (updated)',
+        template_contract: new TemplateContractDetails(
+            minimum_age: 0,
+            pay_duration: new RelativeTime(1_200_000_000),
+            summary: 'Small coffee (updated)',
+            currency: 'KUDOS',
+            amount: 'KUDOS:2.80'
+        ),
+        otp_id: null,
+        editable_defaults: ['extra_note' => true]
+    )
+);
+```
+
+### Delete Template
+
+```php
+Yii::$app->taler->templates()->deleteTemplate('coffee-small');
+```
+
 ## Async Support
 
 All API methods support asynchronous execution by appending `Async` to the method name. Async methods return a promise that resolves to the same typed DTO as the synchronous variant.
