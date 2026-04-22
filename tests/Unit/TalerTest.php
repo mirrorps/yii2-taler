@@ -5,6 +5,7 @@ namespace mirrorps\Yii2Taler\Tests\Unit;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
 use mirrorps\Yii2Taler\Instance\InstanceService;
+use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use mirrorps\Yii2Taler\Taler;
@@ -176,6 +177,24 @@ class TalerTest extends TestCase
         $component = new Taler(['baseUrl' => 'https://example.com']);
 
         $this->assertSame($component->donauCharities(), $component->donauCharities());
+    }
+
+    public function testOtpDevicesReturnsOtpDevicesService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(OtpDevicesService::class, $component->otpDevices());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::otpDevices()}: repeated calls
+     * must return the same OtpDevicesService instance rather than a fresh one.
+     */
+    public function testOtpDevicesReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->otpDevices(), $component->otpDevices());
     }
 
     /**

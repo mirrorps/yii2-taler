@@ -433,6 +433,71 @@ Yii::$app->taler->bankAccounts()->updateAccount(
 Yii::$app->taler->bankAccounts()->deleteAccount('h_wire_hash_here');
 ```
 
+## OTP Devices API
+
+The OTP Devices API is accessible via `Yii::$app->taler->otpDevices()`.
+
+### List OTP Devices
+
+```php
+$response = Yii::$app->taler->otpDevices()->getOtpDevices();
+
+foreach ($response->otp_devices as $device) {
+    echo $device->otp_device_id . ' — ' . $device->device_description . PHP_EOL;
+}
+```
+
+### Get OTP Device Details
+
+```php
+use Taler\Api\OtpDevices\Dto\GetOtpDeviceRequest;
+
+$details = Yii::$app->taler->otpDevices()->getOtpDevice(
+    'pos-terminal-1',
+    new GetOtpDeviceRequest(price: 'KUDOS:1.00')
+);
+
+echo $details->device_description . PHP_EOL;
+echo $details->otp_algorithm . PHP_EOL;
+echo $details->otp_timestamp . PHP_EOL;
+echo ($details->otp_code ?? '(none)') . PHP_EOL;
+```
+
+### Create OTP Device
+
+```php
+use Taler\Api\OtpDevices\Dto\OtpDeviceAddDetails;
+
+Yii::$app->taler->otpDevices()->createOtpDevice(
+    new OtpDeviceAddDetails(
+        otp_device_id: 'pos-terminal-1',
+        otp_device_description: 'Front desk terminal',
+        otp_key: 'JBSWY3DPEHPK3PXP',
+        otp_algorithm: 'TOTP_WITHOUT_PRICE',
+    )
+);
+```
+
+### Update OTP Device
+
+```php
+use Taler\Api\OtpDevices\Dto\OtpDevicePatchDetails;
+
+Yii::$app->taler->otpDevices()->updateOtpDevice(
+    'pos-terminal-1',
+    new OtpDevicePatchDetails(
+        otp_device_description: 'Front desk terminal (updated)',
+        otp_algorithm: 'TOTP_WITH_PRICE',
+    )
+);
+```
+
+### Delete OTP Device
+
+```php
+Yii::$app->taler->otpDevices()->deleteOtpDevice('pos-terminal-1');
+```
+
 ## Donau Charity API
 
 The Donau Charity API is accessible via `Yii::$app->taler->donauCharities()`.

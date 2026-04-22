@@ -3,6 +3,7 @@
 namespace mirrorps\Yii2Taler;
 
 use mirrorps\Yii2Taler\Instance\InstanceService;
+use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
@@ -72,6 +73,7 @@ class Taler extends Component
     private ?ConfigService $_configService = null;
     private ?BankAccountService $_bankAccountService = null;
     private ?DonauCharityService $_donauCharityService = null;
+    private ?OtpDevicesService $_otpDevicesService = null;
 
     /**
      * @throws InvalidConfigException
@@ -165,6 +167,20 @@ class Taler extends Component
         }
 
         return $this->_donauCharityService;
+    }
+
+    /**
+     * Returns the OTP Devices API service.
+     *
+     * @return OtpDevicesService
+     */
+    public function otpDevices(): OtpDevicesService
+    {
+        if ($this->_otpDevicesService === null) {
+            $this->_otpDevicesService = new OtpDevicesService($this);
+        }
+
+        return $this->_otpDevicesService;
     }
 
     /**
