@@ -9,6 +9,9 @@ use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
 use mirrorps\Yii2Taler\Templates\TemplatesService;
+use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
+use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
+use mirrorps\Yii2Taler\Wallet\WalletService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -68,6 +71,7 @@ class Taler extends Component
     private ?TalerClient $_client = null;
 
     private ?OrderService $_orderService = null;
+    private ?WalletService $_walletService = null;
 
     private ?InstanceService $_instanceService = null;
 
@@ -76,6 +80,8 @@ class Taler extends Component
     private ?DonauCharityService $_donauCharityService = null;
     private ?OtpDevicesService $_otpDevicesService = null;
     private ?TemplatesService $_templatesService = null;
+    private ?TokenFamiliesService $_tokenFamiliesService = null;
+    private ?TwoFactorAuthService $_twoFactorAuthService = null;
 
     /**
      * @throws InvalidConfigException
@@ -113,6 +119,20 @@ class Taler extends Component
         }
 
         return $this->_orderService;
+    }
+
+    /**
+     * Returns the Wallet API service.
+     *
+     * @return WalletService
+     */
+    public function wallets(): WalletService
+    {
+        if ($this->_walletService === null) {
+            $this->_walletService = new WalletService($this);
+        }
+
+        return $this->_walletService;
     }
 
     /**
@@ -197,6 +217,34 @@ class Taler extends Component
         }
 
         return $this->_templatesService;
+    }
+
+    /**
+     * Returns the Token Families API service.
+     *
+     * @return TokenFamiliesService
+     */
+    public function tokenFamilies(): TokenFamiliesService
+    {
+        if ($this->_tokenFamiliesService === null) {
+            $this->_tokenFamiliesService = new TokenFamiliesService($this);
+        }
+
+        return $this->_tokenFamiliesService;
+    }
+
+    /**
+     * Returns the Two-Factor Auth API service.
+     *
+     * @return TwoFactorAuthService
+     */
+    public function twoFactorAuth(): TwoFactorAuthService
+    {
+        if ($this->_twoFactorAuthService === null) {
+            $this->_twoFactorAuthService = new TwoFactorAuthService($this);
+        }
+
+        return $this->_twoFactorAuthService;
     }
 
     /**

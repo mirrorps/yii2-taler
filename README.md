@@ -432,6 +432,81 @@ Yii::$app->taler->templates()->updateTemplate(
 Yii::$app->taler->templates()->deleteTemplate('coffee-small');
 ```
 
+## Token Families API
+
+The Token Families API is accessible via `Yii::$app->taler->tokenFamilies()`.
+
+### List Token Families
+
+```php
+$families = Yii::$app->taler->tokenFamilies()->getTokenFamilies();
+
+foreach ($families->token_families as $family) {
+    echo $family->slug . ' — ' . $family->name . ' — ' . $family->kind . PHP_EOL;
+}
+```
+
+### Get Token Family Details
+
+```php
+$family = Yii::$app->taler->tokenFamilies()->getTokenFamily('loyalty-token');
+
+echo $family->slug . PHP_EOL;
+echo $family->name . PHP_EOL;
+echo $family->description . PHP_EOL;
+echo $family->kind . PHP_EOL;
+echo 'issued=' . $family->issued . ', used=' . $family->used . PHP_EOL;
+```
+
+### Create Token Family
+
+```php
+use Taler\Api\Dto\RelativeTime;
+use Taler\Api\Dto\Timestamp;
+use Taler\Api\TokenFamilies\Dto\TokenFamilyCreateRequest;
+
+Yii::$app->taler->tokenFamilies()->createTokenFamily(
+    new TokenFamilyCreateRequest(
+        slug: 'loyalty-token',
+        name: 'Loyalty Program',
+        description: 'Discount token family for recurring buyers',
+        valid_before: new Timestamp(1750000000),
+        duration: new RelativeTime(86400000000),
+        validity_granularity: new RelativeTime(3600000000),
+        start_offset: new RelativeTime(0),
+        kind: 'discount',
+        description_i18n: ['de' => 'Rabatt-Tokenfamilie'],
+        extra_data: ['trusted_domains' => ['merchant.example']],
+        valid_after: new Timestamp(1710000000)
+    )
+);
+```
+
+### Update Token Family
+
+```php
+use Taler\Api\Dto\Timestamp;
+use Taler\Api\TokenFamilies\Dto\TokenFamilyUpdateRequest;
+
+Yii::$app->taler->tokenFamilies()->updateTokenFamily(
+    'loyalty-token',
+    new TokenFamilyUpdateRequest(
+        name: 'Loyalty Program (Updated)',
+        description: 'Updated description for recurring buyers',
+        valid_after: new Timestamp(1710000000),
+        valid_before: new Timestamp(1755000000),
+        description_i18n: ['de' => 'Aktualisierte Rabatt-Tokenfamilie'],
+        extra_data: ['trusted_domains' => ['merchant.example', 'shop.example']]
+    )
+);
+```
+
+### Delete Token Family
+
+```php
+Yii::$app->taler->tokenFamilies()->deleteTokenFamily('loyalty-token');
+```
+
 ## Async Support
 
 All API methods support asynchronous execution by appending `Async` to the method name. Async methods return a promise that resolves to the same typed DTO as the synchronous variant.
@@ -575,6 +650,55 @@ Yii::$app->taler->otpDevices()->updateOtpDevice(
 
 ```php
 Yii::$app->taler->otpDevices()->deleteOtpDevice('pos-terminal-1');
+```
+
+## Two-Factor Auth API
+
+The Two-Factor Auth API is accessible via `Yii::$app->taler->twoFactorAuth()`.
+
+### Request Challenge Transmission
+
+```php
+$response = Yii::$app->taler->twoFactorAuth()->requestChallenge(
+    'sandbox',
+    'challenge-id-123',
+    ['resend' => true]
+);
+
+echo 'solve_expiration: ' . $response->solve_expiration->t_s . PHP_EOL;
+echo 'earliest_retransmission: ' . $response->earliest_retransmission->t_s . PHP_EOL;
+```
+
+### Confirm Challenge
+
+```php
+use Taler\Api\TwoFactorAuth\Dto\MerchantChallengeSolveRequest;
+
+Yii::$app->taler->twoFactorAuth()->confirmChallenge(
+    'sandbox',
+    'challenge-id-123',
+    new MerchantChallengeSolveRequest(tan: '123456')
+);
+```
+
+### Async Two-Factor Calls
+
+```php
+use Taler\Api\TwoFactorAuth\Dto\MerchantChallengeSolveRequest;
+
+$requestPromise = Yii::$app->taler->twoFactorAuth()->requestChallengeAsync(
+    'sandbox',
+    'challenge-id-123',
+    []
+);
+$challenge = $requestPromise->wait();
+
+$confirmPromise = Yii::$app->taler->twoFactorAuth()->confirmChallengeAsync(
+    'sandbox',
+    'challenge-id-123',
+    new MerchantChallengeSolveRequest(tan: '123456')
+);
+$confirmPromise->wait();
 ```
 
 ## Donau Charity API

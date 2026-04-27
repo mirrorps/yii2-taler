@@ -9,6 +9,9 @@ use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
 use mirrorps\Yii2Taler\Taler;
+use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
+use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
+use mirrorps\Yii2Taler\Wallet\WalletService;
 use PHPUnit\Framework\TestCase;
 use Taler\Taler as TalerClient;
 use yii\base\InvalidConfigException;
@@ -125,6 +128,24 @@ class TalerTest extends TestCase
         $this->assertSame($component->orders(), $component->orders());
     }
 
+    public function testWalletsReturnsWalletService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(WalletService::class, $component->wallets());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::wallets()}: repeated calls
+     * must return the same WalletService instance rather than a fresh one.
+     */
+    public function testWalletsReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->wallets(), $component->wallets());
+    }
+
     public function testInstancesReturnsInstanceService(): void
     {
         $component = new Taler(['baseUrl' => 'https://example.com']);
@@ -195,6 +216,42 @@ class TalerTest extends TestCase
         $component = new Taler(['baseUrl' => 'https://example.com']);
 
         $this->assertSame($component->otpDevices(), $component->otpDevices());
+    }
+
+    public function testTokenFamiliesReturnsTokenFamiliesService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(TokenFamiliesService::class, $component->tokenFamilies());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::tokenFamilies()}: repeated calls
+     * must return the same TokenFamiliesService instance rather than a fresh one.
+     */
+    public function testTokenFamiliesReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->tokenFamilies(), $component->tokenFamilies());
+    }
+
+    public function testTwoFactorAuthReturnsService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(TwoFactorAuthService::class, $component->twoFactorAuth());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::twoFactorAuth()}: repeated calls
+     * must return the same TwoFactorAuthService instance rather than a fresh one.
+     */
+    public function testTwoFactorAuthReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->twoFactorAuth(), $component->twoFactorAuth());
     }
 
     /**
