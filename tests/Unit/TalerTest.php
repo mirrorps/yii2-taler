@@ -12,6 +12,7 @@ use mirrorps\Yii2Taler\Taler;
 use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
 use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
 use mirrorps\Yii2Taler\Wallet\WalletService;
+use mirrorps\Yii2Taler\WireTransfers\WireTransfersService;
 use PHPUnit\Framework\TestCase;
 use Taler\Taler as TalerClient;
 use yii\base\InvalidConfigException;
@@ -252,6 +253,24 @@ class TalerTest extends TestCase
         $component = new Taler(['baseUrl' => 'https://example.com']);
 
         $this->assertSame($component->twoFactorAuth(), $component->twoFactorAuth());
+    }
+
+    public function testWireTransfersReturnsService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(WireTransfersService::class, $component->wireTransfers());
+    }
+
+    /**
+     * Guards the lazy-init cache in {@see Taler::wireTransfers()}: repeated calls
+     * must return the same WireTransfersService instance rather than a fresh one.
+     */
+    public function testWireTransfersReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->wireTransfers(), $component->wireTransfers());
     }
 
     /**

@@ -573,6 +573,48 @@ Yii::$app->taler->webhooks()->updateWebhook(
 Yii::$app->taler->webhooks()->deleteWebhook('order-paid-hook');
 ```
 
+## Wire Transfers API
+
+The Wire Transfers API is accessible via `Yii::$app->taler->wireTransfers()`.
+
+### List Wire Transfers
+
+```php
+use Taler\Api\WireTransfers\Dto\GetTransfersRequest;
+
+$transfers = Yii::$app->taler->wireTransfers()->getTransfers(
+    new GetTransfersRequest(limit: 20)
+);
+
+foreach ($transfers->transfers as $transfer) {
+    echo '#' . $transfer->transfer_serial_id
+        . ' ' . $transfer->credit_amount
+        . ' ' . $transfer->payto_uri . PHP_EOL;
+}
+```
+
+### List Wire Transfers With Filters
+
+```php
+use Taler\Api\WireTransfers\Dto\GetTransfersRequest;
+
+$transfers = Yii::$app->taler->wireTransfers()->getTransfers(
+    new GetTransfersRequest(
+        payto_uri: 'payto://iban/DE75512108001245126199?receiver-name=Merchant',
+        expected: 'true',
+        before: '100',
+        after: '1',
+        limit: 10
+    )
+);
+```
+
+### Delete Wire Transfer
+
+```php
+Yii::$app->taler->wireTransfers()->deleteTransfer('transfer-serial-id-42');
+```
+
 ## Async Support
 
 All API methods support asynchronous execution by appending `Async` to the method name. Async methods return a promise that resolves to the same typed DTO as the synchronous variant.

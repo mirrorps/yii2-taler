@@ -13,6 +13,7 @@ use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
 use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
 use mirrorps\Yii2Taler\Wallet\WalletService;
 use mirrorps\Yii2Taler\Webhooks\WebhooksService;
+use mirrorps\Yii2Taler\WireTransfers\WireTransfersService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -84,6 +85,7 @@ class Taler extends Component
     private ?TokenFamiliesService $_tokenFamiliesService = null;
     private ?TwoFactorAuthService $_twoFactorAuthService = null;
     private ?WebhooksService $_webhooksService = null;
+    private ?WireTransfersService $_wireTransfersService = null;
 
     /**
      * @throws InvalidConfigException
@@ -261,6 +263,20 @@ class Taler extends Component
         }
 
         return $this->_webhooksService;
+    }
+
+    /**
+     * Returns the Wire Transfers API service.
+     *
+     * @return WireTransfersService
+     */
+    public function wireTransfers(): WireTransfersService
+    {
+        if ($this->_wireTransfersService === null) {
+            $this->_wireTransfersService = new WireTransfersService($this);
+        }
+
+        return $this->_wireTransfersService;
     }
 
     /**
