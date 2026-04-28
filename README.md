@@ -507,6 +507,72 @@ Yii::$app->taler->tokenFamilies()->updateTokenFamily(
 Yii::$app->taler->tokenFamilies()->deleteTokenFamily('loyalty-token');
 ```
 
+## Webhooks API
+
+The Webhooks API is accessible via `Yii::$app->taler->webhooks()`.
+
+### List Webhooks
+
+```php
+$response = Yii::$app->taler->webhooks()->getWebhooks();
+
+foreach ($response->webhooks as $webhook) {
+    echo $webhook->webhook_id . ' — ' . $webhook->event_type . PHP_EOL;
+}
+```
+
+### Get Webhook Details
+
+```php
+$details = Yii::$app->taler->webhooks()->getWebhook('order-paid-hook');
+
+echo $details->event_type . PHP_EOL;
+echo $details->http_method . PHP_EOL;
+echo $details->url . PHP_EOL;
+```
+
+### Create Webhook
+
+```php
+use Taler\Api\Dto\Url;
+use Taler\Api\Webhooks\Dto\WebhookAddDetails;
+
+Yii::$app->taler->webhooks()->createWebhook(
+    new WebhookAddDetails(
+        webhook_id: 'order-paid-hook',
+        event_type: 'ORDER_PAID',
+        url: Url::fromString('https://merchant.example/webhooks/order-paid'),
+        http_method: 'POST',
+        header_template: "Content-Type: application/json",
+        body_template: '{"order_id":"{{order_id}}","event":"{{event_type}}"}'
+    )
+);
+```
+
+### Update Webhook
+
+```php
+use Taler\Api\Dto\Url;
+use Taler\Api\Webhooks\Dto\WebhookPatchDetails;
+
+Yii::$app->taler->webhooks()->updateWebhook(
+    'order-paid-hook',
+    new WebhookPatchDetails(
+        event_type: 'ORDER_PAID',
+        url: Url::fromString('https://merchant.example/webhooks/order-paid-v2'),
+        http_method: 'POST',
+        header_template: "Content-Type: application/json",
+        body_template: '{"order_id":"{{order_id}}","event":"{{event_type}}","updated":true}'
+    )
+);
+```
+
+### Delete Webhook
+
+```php
+Yii::$app->taler->webhooks()->deleteWebhook('order-paid-hook');
+```
+
 ## Async Support
 
 All API methods support asynchronous execution by appending `Async` to the method name. Async methods return a promise that resolves to the same typed DTO as the synchronous variant.

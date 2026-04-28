@@ -12,6 +12,7 @@ use mirrorps\Yii2Taler\Templates\TemplatesService;
 use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
 use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
 use mirrorps\Yii2Taler\Wallet\WalletService;
+use mirrorps\Yii2Taler\Webhooks\WebhooksService;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
 use yii\base\Component;
@@ -82,6 +83,7 @@ class Taler extends Component
     private ?TemplatesService $_templatesService = null;
     private ?TokenFamiliesService $_tokenFamiliesService = null;
     private ?TwoFactorAuthService $_twoFactorAuthService = null;
+    private ?WebhooksService $_webhooksService = null;
 
     /**
      * @throws InvalidConfigException
@@ -245,6 +247,20 @@ class Taler extends Component
         }
 
         return $this->_twoFactorAuthService;
+    }
+
+    /**
+     * Returns the Webhooks API service.
+     *
+     * @return WebhooksService
+     */
+    public function webhooks(): WebhooksService
+    {
+        if ($this->_webhooksService === null) {
+            $this->_webhooksService = new WebhooksService($this);
+        }
+
+        return $this->_webhooksService;
     }
 
     /**
