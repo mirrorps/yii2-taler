@@ -3,6 +3,7 @@
 namespace mirrorps\Yii2Taler;
 
 use mirrorps\Yii2Taler\Instance\InstanceService;
+use mirrorps\Yii2Taler\Inventory\InventoryService;
 use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
@@ -76,6 +77,7 @@ class Taler extends Component
     private ?WalletService $_walletService = null;
 
     private ?InstanceService $_instanceService = null;
+    private ?InventoryService $_inventoryService = null;
 
     private ?ConfigService $_configService = null;
     private ?BankAccountService $_bankAccountService = null;
@@ -151,6 +153,20 @@ class Taler extends Component
         }
 
         return $this->_instanceService;
+    }
+
+    /**
+     * Returns the Inventory API service.
+     *
+     * @return InventoryService
+     */
+    public function inventories(): InventoryService
+    {
+        if ($this->_inventoryService === null) {
+            $this->_inventoryService = new InventoryService($this);
+        }
+
+        return $this->_inventoryService;
     }
 
     /**

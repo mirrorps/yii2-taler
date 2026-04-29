@@ -5,6 +5,7 @@ namespace mirrorps\Yii2Taler\Tests\Unit;
 use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
 use mirrorps\Yii2Taler\Instance\InstanceService;
+use mirrorps\Yii2Taler\Inventory\InventoryService;
 use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
@@ -163,6 +164,20 @@ class TalerTest extends TestCase
         $component = new Taler(['baseUrl' => 'https://example.com']);
 
         $this->assertSame($component->instances(), $component->instances());
+    }
+
+    public function testInventoriesReturnsInventoryService(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertInstanceOf(InventoryService::class, $component->inventories());
+    }
+
+    public function testInventoriesReturnsSameInstance(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com']);
+
+        $this->assertSame($component->inventories(), $component->inventories());
     }
 
     public function testBankAccountsReturnsBankAccountService(): void

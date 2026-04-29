@@ -507,6 +507,108 @@ Yii::$app->taler->tokenFamilies()->updateTokenFamily(
 Yii::$app->taler->tokenFamilies()->deleteTokenFamily('loyalty-token');
 ```
 
+## Inventory API
+
+The Inventory API is accessible via `Yii::$app->taler->inventories()`.
+
+### List Categories
+
+```php
+$categories = Yii::$app->taler->inventories()->getCategories();
+
+foreach ($categories->categories as $category) {
+    echo $category->category_id . ' — ' . $category->name . PHP_EOL;
+}
+```
+
+### Create Category
+
+```php
+use Taler\Api\Inventory\Dto\CategoryCreateRequest;
+
+$created = Yii::$app->taler->inventories()->createCategory(
+    new CategoryCreateRequest(
+        name: 'Beverages',
+        name_i18n: ['de' => 'Getranke']
+    )
+);
+
+echo 'New category id: ' . $created->category_id . PHP_EOL;
+```
+
+### List Products
+
+```php
+use Taler\Api\Inventory\Dto\GetProductsRequest;
+
+$products = Yii::$app->taler->inventories()->getProducts(
+    new GetProductsRequest(limit: 20)
+);
+
+foreach ($products->products as $entry) {
+    echo $entry->product_id . ' serial=' . $entry->product_serial . PHP_EOL;
+}
+```
+
+### Create Product
+
+```php
+use Taler\Api\Inventory\Dto\ProductAddDetail;
+
+Yii::$app->taler->inventories()->createProduct(
+    new ProductAddDetail(
+        product_id: 'coffee-small',
+        description: 'Small brewed coffee',
+        unit: 'cup',
+        price: 'KUDOS:2.50',
+        total_stock: 100,
+        product_name: 'Coffee Small',
+        categories: [1]
+    )
+);
+```
+
+### Update Product
+
+```php
+use Taler\Api\Inventory\Dto\ProductPatchDetail;
+
+Yii::$app->taler->inventories()->updateProduct(
+    'coffee-small',
+    new ProductPatchDetail(
+        description: 'Small brewed coffee (updated)',
+        unit: 'cup',
+        price: 'KUDOS:2.80',
+        total_stock: 120,
+        product_name: 'Coffee Small',
+        categories: [1]
+    )
+);
+```
+
+### Lock Product
+
+```php
+use Taler\Api\Dto\RelativeTime;
+use Taler\Api\Inventory\Dto\LockRequest;
+
+Yii::$app->taler->inventories()->lockProduct(
+    'coffee-small',
+    new LockRequest(
+        lock_uuid: '123e4567-e89b-12d3-a456-426614174000',
+        duration: new RelativeTime(60_000_000),
+        quantity: 2
+    )
+);
+```
+
+### Delete Product / Category
+
+```php
+Yii::$app->taler->inventories()->deleteProduct('coffee-small');
+Yii::$app->taler->inventories()->deleteCategory(1);
+```
+
 ## Webhooks API
 
 The Webhooks API is accessible via `Yii::$app->taler->webhooks()`.
