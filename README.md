@@ -28,6 +28,73 @@ Add the Taler component to your application configuration:
 ],
 ```
 
+## Logging
+
+`yii2-taler` integrates with Yii's logging subsystem by default. The component
+passes a PSR-3 logger adapter to `taler-php`, so request failures, protocol
+warnings, and optional debug request/response logs are written through Yii log
+targets.
+
+Configure logging at the application config level:
+
+```php
+'components' => [
+    'taler' => [
+        'class'               => \mirrorps\Yii2Taler\Taler::class,
+        'baseUrl'             => 'https://backend.demo.taler.net/instances/sandbox',
+        'token'               => 'Bearer secret-token:sandbox',
+        'loggerCategory'      => 'taler',
+        'debugLoggingEnabled' => YII_DEBUG,
+    ],
+],
+```
+
+The `loggerCategory` defaults to `yii2-taler`. Route it like any other Yii log
+category:
+
+```php
+'components' => [
+    'log' => [
+        'targets' => [
+            [
+                'class'      => \yii\log\FileTarget::class,
+                'categories' => ['taler', 'yii2-taler'],
+                'levels'     => ['error', 'warning', 'info', 'trace'],
+            ],
+        ],
+    ],
+],
+```
+
+For advanced use cases, provide any PSR-3 logger instance or Yii object
+definition via `logger`. Set `logger` to `false` to disable logging for the
+underlying Taler client:
+
+```php
+'taler' => [
+    'class'  => \mirrorps\Yii2Taler\Taler::class,
+    'baseUrl' => 'https://backend.demo.taler.net/instances/sandbox',
+    'token'  => 'Bearer secret-token:sandbox',
+    'logger' => [
+        'class'    => \mirrorps\Yii2Taler\Log\YiiLogger::class,
+        'category' => 'payments.taler',
+    ],
+],
+```
+
+Runtime changes are supported before the underlying client is created:
+
+```php
+Yii::$app->taler->loggerCategory = 'payments.taler';
+Yii::$app->taler->debugLoggingEnabled = true;
+
+$client = Yii::$app->taler->getClient();
+```
+
+After `getClient()` or an API service method has been called, the underlying
+client is memoized; change logging configuration in application config for
+long-lived components.
+
 ## Config API
 
 The Config API is accessible via `Yii::$app->taler->configs()`.

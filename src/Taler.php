@@ -4,6 +4,7 @@ namespace mirrorps\Yii2Taler;
 
 use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Inventory\InventoryService;
+use mirrorps\Yii2Taler\Log\YiiLogger;
 use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\Config\ConfigService;
@@ -15,8 +16,11 @@ use mirrorps\Yii2Taler\TokenFamilies\TokenFamiliesService;
 use mirrorps\Yii2Taler\Wallet\WalletService;
 use mirrorps\Yii2Taler\Webhooks\WebhooksService;
 use mirrorps\Yii2Taler\WireTransfers\WireTransfersService;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Taler\Factory\Factory;
 use Taler\Taler as TalerClient;
+use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 
@@ -71,7 +75,18 @@ class Taler extends Component
     /** @var bool Enable debug logging */
     public bool $debugLoggingEnabled = false;
 
+    /**
+     * @var LoggerInterface|array<string, mixed>|string|false|null PSR-3 logger,
+     * Yii object definition, class name, false to disable logging, or null to use Yii logging.
+     */
+    public mixed $logger = null;
+
+    /** @var string Yii log category used by the default logger adapter */
+    public string $loggerCategory = 'yii2-taler';
+
     private ?TalerClient $_client = null;
+
+    private ?LoggerInterface $_logger = null;
 
     private ?OrderService $_orderService = null;
     private ?WalletService $_walletService = null;
@@ -111,6 +126,20 @@ class Taler extends Component
         }
 
         return $this->_client;
+    }
+
+    /**
+     * Returns the PSR-3 logger passed to taler-php.
+     *
+     * @throws InvalidConfigException
+     */
+    public function getLogger(): LoggerInterface
+    {
+        if ($this->_logger === null) {
+            $this->_logger = $this->createLogger();
+        }
+
+        return $this->_logger;
     }
 
     /**
@@ -319,6 +348,7 @@ class Taler extends Component
             'base_url'            => $this->baseUrl,
             'wrapResponse'        => $this->wrapResponse,
             'debugLoggingEnabled' => $this->debugLoggingEnabled,
+            'logger'              => $this->getLogger(),
         ];
 
         if ($this->token !== null) {
@@ -350,5 +380,33 @@ class Taler extends Component
         }
 
         return $options;
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    private function createLogger(): LoggerInterface
+    {
+        if ($this->logger === false) {
+            return new NullLogger();
+        }
+
+        if ($this->logger === null) {
+            return new YiiLogger(['category' => $this->loggerCategory]);
+        }
+
+        if ($this->logger instanceof LoggerInterface) {
+            return $this->logger;
+        }
+
+        if (is_array($this->logger) || is_string($this->logger)) {
+            $logger = Yii::createObject($this->logger);
+
+            if ($logger instanceof LoggerInterface) {
+                return $logger;
+            }
+        }
+
+        throw new InvalidConfigException(static::class . '::$logger must be a PSR-3 logger, Yii object definition, class name, false, or null.');
     }
 }

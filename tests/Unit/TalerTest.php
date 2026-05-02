@@ -6,6 +6,7 @@ use mirrorps\Yii2Taler\Config\ConfigService;
 use mirrorps\Yii2Taler\DonauCharity\DonauCharityService;
 use mirrorps\Yii2Taler\Instance\InstanceService;
 use mirrorps\Yii2Taler\Inventory\InventoryService;
+use mirrorps\Yii2Taler\Log\YiiLogger;
 use mirrorps\Yii2Taler\OtpDevices\OtpDevicesService;
 use mirrorps\Yii2Taler\Order\OrderService;
 use mirrorps\Yii2Taler\BankAccount\BankAccountService;
@@ -15,6 +16,7 @@ use mirrorps\Yii2Taler\TwoFactorAuth\TwoFactorAuthService;
 use mirrorps\Yii2Taler\Wallet\WalletService;
 use mirrorps\Yii2Taler\WireTransfers\WireTransfersService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Taler\Taler as TalerClient;
 use yii\base\InvalidConfigException;
 use yii\base\UnknownMethodException;
@@ -50,6 +52,8 @@ class TalerTest extends TestCase
         $this->assertNull($component->description);
         $this->assertTrue($component->wrapResponse);
         $this->assertFalse($component->debugLoggingEnabled);
+        $this->assertNull($component->logger);
+        $this->assertSame('yii2-taler', $component->loggerCategory);
     }
 
     public function testTokenPropertyIsAssigned(): void
@@ -84,6 +88,7 @@ class TalerTest extends TestCase
             'description'         => 'integration-token',
             'wrapResponse'        => false,
             'debugLoggingEnabled' => true,
+            'loggerCategory'      => 'taler-api',
         ]);
 
         $this->assertSame('sandbox', $component->instance);
@@ -92,6 +97,58 @@ class TalerTest extends TestCase
         $this->assertSame('integration-token', $component->description);
         $this->assertFalse($component->wrapResponse);
         $this->assertTrue($component->debugLoggingEnabled);
+        $this->assertSame('taler-api', $component->loggerCategory);
+    }
+
+    public function testGetLoggerReturnsDefaultYiiLogger(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com', 'loggerCategory' => 'taler-api']);
+
+        $logger = $component->getLogger();
+
+        $this->assertInstanceOf(YiiLogger::class, $logger);
+        $this->assertSame('taler-api', $logger->category);
+        $this->assertSame($logger, $component->getLogger());
+    }
+
+    public function testGetLoggerCanBeDisabled(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com', 'logger' => false]);
+
+        $this->assertInstanceOf(NullLogger::class, $component->getLogger());
+    }
+
+    public function testGetLoggerAcceptsPsrLoggerInstance(): void
+    {
+        $logger = new NullLogger();
+        $component = new Taler(['baseUrl' => 'https://example.com', 'logger' => $logger]);
+
+        $this->assertSame($logger, $component->getLogger());
+    }
+
+    public function testGetLoggerAcceptsYiiObjectDefinition(): void
+    {
+        $component = new Taler([
+            'baseUrl' => 'https://example.com',
+            'logger'  => [
+                'class'    => YiiLogger::class,
+                'category' => 'taler-api',
+            ],
+        ]);
+
+        $logger = $component->getLogger();
+
+        $this->assertInstanceOf(YiiLogger::class, $logger);
+        $this->assertSame('taler-api', $logger->category);
+    }
+
+    public function testGetLoggerRejectsInvalidDefinition(): void
+    {
+        $component = new Taler(['baseUrl' => 'https://example.com', 'logger' => new \stdClass()]);
+
+        $this->expectException(InvalidConfigException::class);
+
+        $component->getLogger();
     }
 
     public function testConfigsReturnsConfigService(): void
@@ -347,10 +404,12 @@ class TalerTest extends TestCase
 
         $options = $this->invokeBuildOptions($component);
 
+        $this->assertInstanceOf(YiiLogger::class, $options['logger']);
         $this->assertSame([
             'base_url'            => 'https://example.com',
             'wrapResponse'        => true,
             'debugLoggingEnabled' => false,
+            'logger'              => $options['logger'],
         ], $options);
     }
 
@@ -371,10 +430,12 @@ class TalerTest extends TestCase
 
         $options = $this->invokeBuildOptions($component);
 
+        $this->assertInstanceOf(YiiLogger::class, $options['logger']);
         $this->assertSame([
             'base_url'            => 'https://example.com',
             'wrapResponse'        => false,
             'debugLoggingEnabled' => true,
+            'logger'              => $options['logger'],
             'token'               => 'Bearer token',
             'username'            => 'merchant',
             'password'            => 'secret',
