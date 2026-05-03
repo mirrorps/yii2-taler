@@ -1,7 +1,5 @@
 # yii2-taler
 
-> **Notice:** This package is under active development, and the code may change.
-
 Yii2 extension for GNU Taler REST API integration.
 
 ## Installation

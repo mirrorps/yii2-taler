@@ -6,7 +6,7 @@
   "require": {
     "php": ">=8.1",
     "yiisoft/yii2": "^2.0",
-    "mirrorps/taler-php": "dev-main",
+    "mirrorps/taler-php": "^1.2.2",
     "psr/http-client": "^1.0",
     "guzzlehttp/guzzle": "^7.0"
   },
@@ -19,12 +19,6 @@
       "mirrorps\\Yii2Taler\\Tests\\": "tests/"
     }
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/mirrorps/taler-php"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "mirrorps\\Yii2Taler\\": "src/"
@@ -33,8 +27,6 @@
   "extra": {
     "bootstrap": "mirrorps\\Yii2Taler\\Bootstrap"
   },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "config": {
     "allow-plugins": {
       "yiisoft/yii2-composer": true
