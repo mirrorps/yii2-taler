@@ -21,5 +21,6 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer
+      - run: composer require --dev yidas/yii2-composer-bower-skip
       - run: composer install --prefer-dist --no-progress
       - run: ./vendor/bin/phpunit --testdox
